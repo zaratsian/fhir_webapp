@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!-- Meta, title, CSS, favicons, etc. -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>GCP App</title>
+
+    <!-- Bootstrap -->
+    <link href="../static/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="../static/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <!-- NProgress -->
+    <link href="../static/vendors/nprogress/nprogress.css" rel="stylesheet">
+
+    <!-- Custom Theme Style -->
+    <link href="../static/build/css/custom.min.css" rel="stylesheet">
+
+    <link href="../static/vendors/select2/dist/css/select2.min.css" rel="stylesheet">
+
+
+
+<style>
+
+.link {
+    stroke: #666;
+    opacity: 0.7;
+    stroke-width: 1.5px;
+}
+.node circle {
+    stroke: #fff;
+    opacity: 0.4;
+    stroke-width: 1.5px;
+}
+text {
+    font: 15px serif;
+    opacity: 0.8;
+    pointer-events: none;
+    }
+
+</style>
+
+
+
+  </head>
+
+  <body class="nav-sm">
+    <div class="container body">
+      <div class="main_container">
+        <div class="col-md-3 left_col">
+          <div class="left_col scroll-view">
+            <div class="navbar nav_title" style="border: 0;">
+              <a href="/" class="site_title"><i class="fa fa-medkit"></i> <span>Healthcare App (built by GCP)</span></a>
+            </div>
+
+            <div class="clearfix"></div>
+
+            <br />
+
+            <!-- sidebar menu -->
+            <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
+
+              <div class="menu_section">
+                <h3>Categories</h3>
+                <ul class="nav side-menu">
+                  <li><a href="/"><i class="fa fa-search"></i> SEARCH </a></li>
+                  <li><a href="/manual"><i class="fa fa-edit"></i> MANUAL </a></li>
+                  <li><a href="/network"><i class="fa fa-share-alt"></i>NETWORK</a></li>
+                  <li><a href="/report"><i class="fa fa-bar-chart"></i>REPORT</a></li>
+                  <li><a href="/dialog"><i class="fa fa-comments-o"></i>DIALOG</a></li>	       	
+	          <li><a href="/image"><i class="fa fa-file-image-o"></i> IMAGE </a></li>
+		</ul>
+              </div>
+
+            </div>
+            <!-- /sidebar menu -->
+
+            <!-- /menu footer buttons -->
+            <!--
+            <div class="sidebar-footer hidden-small">
+              <a data-toggle="tooltip" data-placement="top" title="Settings">
+                <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
+              </a>
+              <a data-toggle="tooltip" data-placement="top" title="FullScreen">
+                <span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span>
+              </a>
+              <a data-toggle="tooltip" data-placement="top" title="Lock">
+                <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
+              </a>
+              <a data-toggle="tooltip" data-placement="top" title="Logout">
+                <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
+              </a>
+            </div>
+            -->
+            <!-- /menu footer buttons -->
+          </div>
+        </div>
+
+        <!-- top navigation -->
+        <div class="top_nav">
+	  <h2>&nbsp;Healthcare App</h2>
+          <div class="nav_menu">
+            <nav>
+              <div class="nav toggle">
+                <!--
+                <a id="menu_toggle"><i class="fa fa-bars"></i></a>
+                -->
+              </div>
+
+              <ul class="nav navbar-nav navbar-right">
+                <li class="">
+                  <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                    <i class="fa fa-user"></i>&nbsp;&nbsp;{{ user }}&nbsp;<span class="fa fa-angle-down"></span>
+                  </a>
+		  <!--
+                  <ul class="dropdown-menu dropdown-usermenu pull-right">
+                    <li><a href="/logout">Logout</a></li>
+                  </ul>
+		  -->
+                </li>
+              </ul>
+            </nav>
+          </div>
+        </div>
+        <!-- /top navigation -->
+
+
+
+
+
+
+
+        <!-- page content -->
+        <div class="right_col" role="main">
+          <div class="">
+            <div class="page-title">
+              <div class="title_left">
+                <!-- <h3>ZHeader</h3> -->
+              </div>
+            </div>
+
+            <div class="clearfix"></div>
+
+
+
+            <center>
+	    <div id="viz"></div>
+	    </center>
+
+
+
+          </div>
+        </div>
+        <!-- /page content -->
+
+        <!-- footer content -->
+        <footer>
+          <div class="pull-right">
+            Z2019
+          </div>
+          <div class="clearfix"></div>
+        </footer>
+        <!-- /footer content -->
+      </div>
+    </div>
+
+    <!-- jQuery -->
+    <script src="../static/vendors/jquery/dist/jquery.min.js"></script>
+    <!-- Bootstrap -->
+    <script src="../static/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+    <!-- FastClick -->
+    <script src="../static/vendors/fastclick/lib/fastclick.js"></script>
+    <!-- NProgress -->
+    <script src="../static/vendors/nprogress/nprogress.js"></script>
+    
+    <!-- Custom Theme Scripts -->
+    <script src="../static/build/js/custom.min.js"></script>
+
+
+
+
+
+
+
+<script src="https://d3js.org/d3.v3.min.js"></script>
+
+
+
+
+<script>
+
+
+var links = [{"source": "crestor", "target": "pravastatin"}, {"source": "crestor", "target": "live"}, {"source": "crestor", "target": "relief"}, {"source": "crestor", "target": "cramping"}, {"source": "crestor", "target": "decide"}, {"source": "lipitor", "target": "consider"}, {"source": "lipitor", "target": "simvastatin"}, {"source": "lipitor", "target": "satisfied"}, {"source": "lipitor", "target": "affect"}, {"source": "lipitor", "target": "switch"}, {"source": "statin", "target": "add"}, {"source": "statin", "target": "help"}, {"source": "statin", "target": "test"}, {"source": "statin", "target": "happy"}, {"source": "statin", "target": "risk"}, {"source": "zocor", "target": "80_mg"}, {"source": "zocor", "target": "simvastatin"}, {"source": "zocor", "target": "come"}, {"source": "zocor", "target": "lipitor"}, {"source": "zocor", "target": "lot"}, {"source": "zetia", "target": "discontinue"}, {"source": "zetia", "target": "advise"}, {"source": "zetia", "target": "stuff"}, {"source": "zetia", "target": "50"}, {"source": "zetia", "target": "satisfied"}, {"source": "simvastatin", "target": "period"}, {"source": "simvastatin", "target": "significant"}, {"source": "simvastatin", "target": "discuss"}, {"source": "simvastatin", "target": "risk"}, {"source": "simvastatin", "target": "50"}, {"source": "muscle", "target": "weakness"}, {"source": "muscle", "target": "severe"}, {"source": "muscle", "target": "chest"}, {"source": "muscle", "target": "arm"}, {"source": "muscle", "target": "walk"}, {"source": "doctor", "target": "dr"}, {"source": "doctor", "target": "medical"}, {"source": "doctor", "target": "new"}, {"source": "doctor", "target": "glad"}, {"source": "doctor", "target": "see"}, {"source": "cholesterol", "target": "good"}, {"source": "cholesterol", "target": "number"}, {"source": "cholesterol", "target": "triglyceride"}, {"source": "cholesterol", "target": "200"}, {"source": "cholesterol", "target": "180"}, {"source": "sleep", "target": "cramping"}, {"source": "sleep", "target": "bed"}, {"source": "sleep", "target": "feel"}, {"source": "sleep", "target": "leave"}, {"source": "sleep", "target": "night"}, {"source": "night", "target": "sleep"}, {"source": "night", "target": "bed"}, {"source": "night", "target": "wake"}, {"source": "night", "target": "burn"}, {"source": "night", "target": "terrible"}, {"source": "fatigue", "target": "experience"}, {"source": "fatigue", "target": "extreme"}, {"source": "fatigue", "target": "constant"}, {"source": "fatigue", "target": "difficulty"}, {"source": "fatigue", "target": "symptom"}, {"source": "symptom", "target": "wrist"}, {"source": "symptom", "target": "begin"}, {"source": "symptom", "target": "insomnia"}, {"source": "symptom", "target": "experience"}, {"source": "symptom", "target": "headache"}, {"source": "experience", "target": "insomnia"}, {"source": "experience", "target": "fatigue"}, {"source": "experience", "target": "begin"}, {"source": "experience", "target": "have"}, {"source": "experience", "target": "energy"}, {"source": "problem", "target": "suffer"}, {"source": "problem", "target": "god"}, {"source": "problem", "target": "alot"}, {"source": "problem", "target": "similar"}, {"source": "problem", "target": "wonder"}, {"source": "develop", "target": "soreness"}, {"source": "develop", "target": "cramping"}, {"source": "develop", "target": "experience"}, {"source": "develop", "target": "difficulty"}, {"source": "develop", "target": "leave"}];
+
+var nodes = {}
+
+// Compute the distinct nodes from the links.
+links.forEach(function (link) {
+    link.source = nodes[link.source] || (nodes[link.source] = {
+        name: link.source
+    });
+    link.target = nodes[link.target] || (nodes[link.target] = {
+        name: link.target
+    });
+    link.value = +link.value;
+});
+
+var width  = 900
+    height = 500;
+
+var force = d3.layout.force()
+    .nodes(d3.values(nodes))
+    .links(links)
+    .size([width, height])
+    .linkDistance(50)
+    .charge(-200)
+    .on("tick", tick)
+    .start();
+
+var svg = d3.select("#viz").append("svg")
+    .attr("width", width)
+    .attr("height", height);
+
+var link = svg.selectAll(".link")
+    .data(force.links())
+    .enter().append("line")
+    .attr("class", "link");
+
+var node = svg.selectAll(".node")
+    .data(force.nodes())
+    .enter().append("g")
+    .attr("class", "node")
+    .on("mouseover", mouseover)
+    .on("mouseout", mouseout)
+    .on("click", click)
+    .on("dblclick", dblclick)
+    .call(force.drag);
+
+node.append("circle")
+    .attr("r", 10)
+    .style("fill", "#0606FD");
+
+node.append("text")
+    .attr("x", 14)
+    .attr("dy", ".35em")
+    .style("fill", "#000")
+    .text(function (d) {
+    return d.name;
+});
+
+function tick() {
+    link.attr("x1", function (d) {
+        return d.source.x;
+    })
+        .attr("y1", function (d) {
+        return d.source.y;
+    })
+        .attr("x2", function (d) {
+        return d.target.x;
+    })
+        .attr("y2", function (d) {
+        return d.target.y;
+    });
+
+    node.attr("transform", function(d) {
+    return "translate(" + (d.x = Math.max(10, Math.min(width - 10, d.x))) + "," 
+    + (d.y = Math.max(10, Math.min(height - 10, d.y))) + ")"
+    });
+
+}
+
+function mouseover() {
+    d3.select(this).select("circle").transition()
+        .duration(750)
+        .attr("r", 16);
+}
+
+function mouseout() {
+    d3.select(this).select("circle").transition()
+        .duration(750)
+        .attr("r", 12);
+}
+// action to take on mouse click
+function click() {
+    d3.select(this).select("text").transition()
+        .duration(750)
+        .attr("x", 22)
+        .style("stroke-width", ".5px")
+        .style("opacity", 1)
+        .style("fill", "#E34A33")
+        .style("font", "17.5px serif");
+    d3.select(this).select("circle").transition()
+        .duration(750)
+        .style("fill", "#E34A33")
+        .attr("r", 16)
+}
+
+// action to take on mouse double click
+function dblclick() {
+    d3.select(this).select("circle").transition()
+        .duration(750)
+        .attr("r", 12)
+        .style("fill", "#E34A33");
+    d3.select(this).select("text").transition()
+        .duration(750)
+        .attr("x", 14)
+        .style("stroke", "none")
+        .style("fill", "#E34A33")
+        .style("stroke", "none")
+        .style("opacity", 0.6)
+        .style("font", "14px serif");
+}
+
+
+</script>
+
+
+
+
+
+
+  </body>
+</html>
