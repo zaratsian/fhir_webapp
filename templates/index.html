@@ -134,7 +134,165 @@
 
 
 
-{{ body|safe }}
+
+
+
+
+        {% if user_authenticated == False %}
+        
+            {{ body | safe }}
+        
+            <!--
+            <center>
+                <p><a href="/logout">Change patient</a></p>
+            </center>
+            <center>
+                <p>Please <a href="https://gcp-hcls-test.apigee.net/oauth/v2/authorize?response_type=code&client_id=HMpLixwYJvGntZhNPXdIgMJVrXeGA7qg&redirect_uri=http%3A%2F%2Flocalhost%3A8000%2Ffhir-app%2F&scope=launch%2Fpatient+launch%2Fpatient+fhirUser+openid+patient%2F%2A.read&aud=https%3A%2F%2Fgcp-hcls-test.apigee.net%2Fv1%2Fr4%2Fcarin%2F&state=6c2c9725">authorize</a>.</p>
+            </center>
+            <center>
+                <p><a href="/reset" style="font-size:small;">Reset</a></p>
+            </center>
+            -->
+        
+        
+        {% else %}
+            
+            <center>
+                <p><a href="/logout">Logout</a></p>
+            </center>
+            
+            
+            <div class="x_content">
+				<br />
+				<form action="/" method="POST" id="demo-form2" data-parsley-validate class="form-horizontal form-label-left">
+
+					<div class="item form-group">
+						<div class="col-md-3 col-sm-6 "></div>
+						<div class="col-md-6 col-sm-6 ">
+							<select id="username" name="username" class="form-control" required="required">
+								<option value="" disabled selected >Select a Member</option>
+								<option value="Mrs. Katina266 Hamill307" >Mrs. Katina266 Hamill307 (fhir patient1)</option>
+								<option value="Ms. Joey457 Ritchie586" >  Ms. Joey457 Ritchie586 (fhir patient2)</option>
+								<option value="Mrs. Margery365 Kunde533" >Mrs. Margery365 Kunde533 (fhir patient3)</option>
+							</select>
+						</div>
+						<div class="col-md-3 col-sm-6 "></div>
+					</div>
+
+					
+					<div class="ln_solid"></div>
+					<div class="item form-group">
+					    <div class="col-md-3 col-sm-6 "></div>
+						<div class="col-md-6 col-sm-6 offset-md-3">
+							<center><button type="submit" class="btn btn-primary">Get Member Activity</button></center>
+						</div>
+						<div class="col-md-3 col-sm-6 "></div>
+					</div>
+
+				</form>
+		    </div>
+            
+            
+            
+            <div class="row">
+                <div class="col-md-2 col-xs-1 "></div>
+                <div class="col-md-8 col-xs-1 ">
+                    <center><p>You are authorized as <b>{{ user }}</b>.</p></center>
+                    <br>
+                    <center><p>You are querying data for <b>{{ username }}</b>.</p></center>
+                    
+                    
+                    
+                    {% if claims != [] %}
+                        <br>
+                        
+                        <div class="x_panel">
+                          <div class="x_title">
+                            <h2><b>Claims</b></h2>
+                            <ul class="nav navbar-right panel_toolbox">
+                            </ul>
+                            <div class="clearfix"></div>
+                          </div>
+                          <div class="x_content">
+        
+                            <table class="table table-striped">
+                              <thead>
+                                <tr>
+                                  <th>Claim Description</th>
+                                  <th>Cost</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                    {% for claim in claims %}
+                                    <tr>
+                                        <td>{{ claim['claim_desc'] }}</td>
+                                        <td>{{ claim['claim_value'] }}</td>
+                                    </tr>
+                                    {% endfor %}
+                              </tbody>
+                            </table>
+        
+                          </div>
+                        </div>
+                    
+                    {% endif %}
+                    
+                    
+                    
+                    {% if encounters != [] %}
+                        <br><br><br>
+                        
+                        <div class="x_panel">
+                          <div class="x_title">
+                            <h2><b>Encounters</b></h2>
+                            <ul class="nav navbar-right panel_toolbox">
+                            </ul>
+                            <div class="clearfix"></div>
+                          </div>
+                          <div class="x_content">
+        
+                            <table class="table table-striped">
+                              <thead>
+                                <tr>
+                                  <th>Encounter Date</th>
+                                  <th>Encounter Description</th>
+                                  <th>Provider</th>
+                                  <th>Practitioner</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                    {% for encounter in encounters %}
+                                    <tr>
+                                        <td>{{ encounter['encounter_date'] }}</td>
+                                        <td>{{ encounter['encounter_desc'] }}</td>
+                                        <td>{{ encounter['provider'] }}</td>
+                                        <td>{{ encounter['practitioner'] }}</td>
+                                    </tr>
+                                    {% endfor %}
+                              </tbody>
+                            </table>
+        
+                          </div>
+                        </div>
+                    
+                    {% endif %}
+                    
+                    
+                    
+                </div>
+                <div class="col-md-8 col-xs-1 "></div>
+            </div>
+        
+        
+        {% endif %}
+
+
+
+
+
+
+
+
 
 
 

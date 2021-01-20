@@ -19,6 +19,12 @@ smart_defaults = {
     'scope': 'launch/patient fhirUser openid patient/*.read'
 }
 
+patient_config = {
+    'Mrs. Katina266 Hamill307': '5b72debb-60d1-49f9-8f3a-8220f894ca95',
+    'Ms. Joey457 Ritchie586':   '22efb1f8-3d1f-4cc6-9dfc-60aabcbe114c',
+    'Mrs. Margery365 Kunde533': 'a28340a7-41e5-47ef-b0c9-e984341fa101',
+}
+
 app = Flask(__name__)
 
 def _save_state(state):
@@ -93,52 +99,62 @@ def _get_claim_name(claim, client=None):
         return 'Error: medication not found'
 
 
-@app.route('/')
+@app.route('/', methods=["GET","POST"])
 def index():
-    """ The app's main page.
-    """
+    
+    username = ''
     name = ''
     smart = _get_smart()
-    #body = '<h1>SMART on FHIR WebApp</h1>'
+    user_authenticated = False
     body = ''
-    body += '<center><p><a href="/logout">Change patient</a></p></center>'
     
     if smart.ready and smart.patient is not None:       # "ready" may be true but the access token may have expired, making smart.patient = None
-        body += '<div class="row">'
-        body += '<div class="col-md-2 col-xs-1 "></div>'
-        body += '<div class="col-md-8 col-xs-1 ">'
+        
+        user_authenticated = True
         
         name = smart.human_name(smart.patient.name[0] if smart.patient.name and len(smart.patient.name) > 0 else 'Unknown')
-        body += "<center><p>You are authorized as <b>{0}</b>.</p></center>".format(name)
+        
+        if request.method == 'GET':
+            username = name
+        elif request.method == 'POST':
+            username = request.form['username']
+        
+        patient_id = patient_config[username]
+        
+        print('[ INFO ] SMART Name:       {}'.format(name))
+        print('[ INFO ] Username:         {}'.format(username))
+        print('[ INFO ] SMART Patient ID: {}'.format(smart.patient_id))
+        print('[ INFO ] patient_id:       {}'.format(patient_id))
         ##############################################
         # CLAIMS
         ##############################################
         claims = []
-        claim_bundle = Claim.where({'patient': smart.patient_id}).perform(smart.server)
-        claim_json = claim_bundle.as_json()['entry'][0]['resource']['item']
+        claim_json = {}
+        claim_bundle = ''
+        #claim_bundle = Claim.where({'patient': smart.patient_id}).perform(smart.server)
+        #print('[ INFO ] Claim JSON before: {}'.format(claim_bundle))
+        claim_bundle = Claim.where({'patient': patient_id}).perform(smart.server)
+        claim_json   = claim_bundle.as_json()['entry'][0]['resource']['item']
+        #print('[ INFO ] Claim JSON after:  {}'.format(claim_bundle))
+        
         #print('[ *********** ] Claim: {}'.format(claim_bundle.as_json()['entry'][0]))
-        body += '<br><b>Claims:</b><br>'
-        body += '<ul>'
         for claim in claim_json:
             try:
                 claim_value = claim['net']['value']
                 claim_desc  = claim['productOrService']['text']
                 claims.append({'claim_desc':claim_desc, 'claim_value':claim_value})
-                body += '<li>{} (${})</li>'.format(claim_desc,claim_value)
                 #print('[ *********** ] Claim: {} (${})'.format(claim_desc,claim_value))
             except Exception as e:
                 print('[ EXCEPTION ] {}'.format(e))
-        
-        body += '</ul>'
         
         ##############################################
         # Encounters
         ##############################################
         encounters = []
-        encounter_bundle = Encounter.where({'patient': smart.patient_id}).perform(smart.server)
+        #encounter_bundle = Encounter.where({'patient': smart.patient_id}).perform(smart.server)
+        encounter_bundle = Encounter.where({'patient': patient_id}).perform(smart.server)
         encounter_json = encounter_bundle.as_json()['entry']
-        body += '<br><b>Encounters:</b><br>'
-        body += '<ul>'
+        #print('[ INFO ] Encounter JSON after:  {}'.format(encounter_json))
         #print('[ *********** ] Encounters: {}'.format(encounter_json))
         for encounter in encounter_json:
             try:
@@ -147,11 +163,8 @@ def index():
                 encounter_date  = encounter['resource']['period']['start']
                 encounter_desc  = encounter['resource']['type'][0]['text']
                 encounters.append({'provider':serviceProvider, 'practitioner':practitioner, 'encounter_date':encounter_date, 'encounter_desc':encounter_desc})
-                body += '<li>{}:&nbsp;&nbsp;{}&nbsp;&nbsp;({})&nbsp; - &nbsp;{}</li>'.format(encounter_date,serviceProvider,practitioner,encounter_desc)
             except Exception as e:
                 print('[ EXCEPTION ] {}'.format(e))
-        
-        body += '</ul>'
         
         ##############################################
         # Prescriptions
@@ -165,12 +178,10 @@ def index():
         else:
             body += "<p>(There are no prescriptions for {0})</p>".format("him" if 'male' == smart.patient.gender else "her")
         '''
-        
-        body += '</div>'
-        body += '<div class="col-md-8 col-xs-1 "></div>'
-        body += '</div>'
     
     else:
+        claims = ''
+        encounters = ''
         auth_url = smart.authorize_url
         if auth_url is not None:
             body += """<center><p>Please <a href="{0}">authorize</a>.</p></center>""".format(auth_url)
@@ -178,7 +189,7 @@ def index():
             body += """<center><p>Running against a no-auth server, nothing to demo here.</p></center> """
         body += """<center><p><a href="/reset" style="font-size:small;">Reset</a></p></center>"""
     
-    return render_template('index.html', user=name, body=body)
+    return render_template('index.html', user=name, username=username, body=body, user_authenticated=user_authenticated, claims=claims, encounters=encounters)
 
 
 
