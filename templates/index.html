@@ -170,10 +170,10 @@
 						<div class="col-md-3 col-sm-6 "></div>
 						<div class="col-md-6 col-sm-6 ">
 							<select id="username" name="username" class="form-control" required="required">
-								<option value="" disabled selected >Select a Member</option>
-								<option value="Mrs. Katina266 Hamill307" >Mrs. Katina266 Hamill307 (fhir patient1)</option>
-								<option value="Ms. Joey457 Ritchie586" >  Ms. Joey457 Ritchie586 (fhir patient2)</option>
-								<option value="Mrs. Margery365 Kunde533" >Mrs. Margery365 Kunde533 (fhir patient3)</option>
+								<!-- <option value="" disabled selected >Select a Member</option> -->
+								<option value="Mrs. Katina266 Hamill307" {% if username=="Mrs. Katina266 Hamill307" %} selected {% endif %}>Mrs. Katina266 Hamill307 (fhir patient1)</option>
+								<option value="Ms. Joey457 Ritchie586"   {% if username=="Ms. Joey457 Ritchie586"   %} selected {% endif %}>Ms. Joey457 Ritchie586 (fhir patient2)</option>
+								<option value="Mrs. Margery365 Kunde533" {% if username=="Mrs. Margery365 Kunde533" %} selected {% endif %}>Mrs. Margery365 Kunde533 (fhir patient3)</option>
 							</select>
 						</div>
 						<div class="col-md-3 col-sm-6 "></div>
@@ -198,9 +198,7 @@
                 <div class="col-md-2 col-xs-1 "></div>
                 <div class="col-md-8 col-xs-1 ">
                     <center><p>You are authorized as <b>{{ user }}</b>.</p></center>
-                    <br>
-                    <center><p>You are querying data for <b>{{ username }}</b>.</p></center>
-                    
+                
                     
                     
                     {% if claims != [] %}
