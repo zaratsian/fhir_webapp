@@ -121,63 +121,49 @@ def index():
         
         patient_id = patient_config[username]
         
-        print('[ INFO ] SMART Name:       {}'.format(name))
-        print('[ INFO ] Username:         {}'.format(username))
-        print('[ INFO ] SMART Patient ID: {}'.format(smart.patient_id))
-        print('[ INFO ] patient_id:       {}'.format(patient_id))
+        print('[ INFO ] Smart Patient_ID:         {}'.format(smart.patient_id))
+        print('[ INFO ] Entered patient_id:       {}'.format(patient_id))
+        
         ##############################################
         # CLAIMS
         ##############################################
         claims = []
-        claim_json = {}
-        claim_bundle = ''
-        #claim_bundle = Claim.where({'patient': smart.patient_id}).perform(smart.server)
-        #print('[ INFO ] Claim JSON before: {}'.format(claim_bundle))
-        claim_bundle = Claim.where({'patient': patient_id}).perform(smart.server)
-        claim_json   = claim_bundle.as_json()['entry'][0]['resource']['item']
-        #print('[ INFO ] Claim JSON after:  {}'.format(claim_bundle))
-        
-        #print('[ *********** ] Claim: {}'.format(claim_bundle.as_json()['entry'][0]))
-        for claim in claim_json:
-            try:
-                claim_value = claim['net']['value']
-                claim_desc  = claim['productOrService']['text']
-                claims.append({'claim_desc':claim_desc, 'claim_value':claim_value})
-                #print('[ *********** ] Claim: {} (${})'.format(claim_desc,claim_value))
-            except Exception as e:
-                print('[ EXCEPTION ] {}'.format(e))
+        if smart.patient_id == patient_id:
+            #claim_bundle = Claim.where({'patient': smart.patient_id}).perform(smart.server)
+            #print('[ INFO ] Claim JSON before: {}'.format(claim_bundle))
+            claim_bundle = Claim.where({}).perform(smart.server)
+            claim_json   = claim_bundle.as_json()['entry'][0]['resource']['item']
+            #print('[ INFO ] Claim JSON after:  {}'.format(claim_bundle))
+            
+            #print('[ *********** ] Claim: {}'.format(claim_bundle.as_json()['entry'][0]))
+            for claim in claim_json:
+                try:
+                    claim_value = claim['net']['value']
+                    claim_desc  = claim['productOrService']['text']
+                    claims.append({'claim_desc':claim_desc, 'claim_value':claim_value})
+                    #print('[ *********** ] Claim: {} (${})'.format(claim_desc,claim_value))
+                except Exception as e:
+                    print('[ EXCEPTION ] {}'.format(e))
         
         ##############################################
         # Encounters
         ##############################################
         encounters = []
-        #encounter_bundle = Encounter.where({'patient': smart.patient_id}).perform(smart.server)
-        encounter_bundle = Encounter.where({'patient': patient_id}).perform(smart.server)
-        encounter_json = encounter_bundle.as_json()['entry']
-        #print('[ INFO ] Encounter JSON after:  {}'.format(encounter_json))
-        #print('[ *********** ] Encounters: {}'.format(encounter_json))
-        for encounter in encounter_json:
-            try:
-                serviceProvider = encounter['resource']['serviceProvider']['display']
-                practitioner    = encounter['resource']['participant'][0]['individual']['display']
-                encounter_date  = encounter['resource']['period']['start']
-                encounter_desc  = encounter['resource']['type'][0]['text']
-                encounters.append({'provider':serviceProvider, 'practitioner':practitioner, 'encounter_date':encounter_date, 'encounter_desc':encounter_desc})
-            except Exception as e:
-                print('[ EXCEPTION ] {}'.format(e))
-        
-        ##############################################
-        # Prescriptions
-        ##############################################
-        '''
-        body += "<p>You are logged in as <b>{0}</b>.</p>".format(name)
-        body += '<br><p><a href="/logout">Change patient</a></p>'
-        pres = _get_prescriptions(smart)
-        if pres is not None:
-            body += "<p>{0} prescriptions: <ul><li>{1}</li></ul></p>".format("His" if 'male' == smart.patient.gender else "Her", '</li><li>'.join([_get_med_name(p,smart) for p in pres]))
-        else:
-            body += "<p>(There are no prescriptions for {0})</p>".format("him" if 'male' == smart.patient.gender else "her")
-        '''
+        if smart.patient_id == patient_id:
+            #encounter_bundle = Encounter.where({'patient': smart.patient_id}).perform(smart.server)
+            encounter_bundle = Encounter.where({'patient': patient_id}).perform(smart.server)
+            encounter_json = encounter_bundle.as_json()['entry']
+            #print('[ INFO ] Encounter JSON after:  {}'.format(encounter_json))
+            #print('[ *********** ] Encounters: {}'.format(encounter_json))
+            for encounter in encounter_json:
+                try:
+                    serviceProvider = encounter['resource']['serviceProvider']['display']
+                    practitioner    = encounter['resource']['participant'][0]['individual']['display']
+                    encounter_date  = encounter['resource']['period']['start']
+                    encounter_desc  = encounter['resource']['type'][0]['text']
+                    encounters.append({'provider':serviceProvider, 'practitioner':practitioner, 'encounter_date':encounter_date, 'encounter_desc':encounter_desc})
+                except Exception as e:
+                    print('[ EXCEPTION ] {}'.format(e))
     
     else:
         claims = ''
